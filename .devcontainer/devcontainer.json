@@ -1,7 +1,7 @@
 {
   "name": "OpenResty Lua API",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y openresty mysql-server",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y wget gnupg lsb-release && wget -qO - https://openresty.org/package/pubkey.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/openresty.gpg && echo 'deb http://openresty.org/package/ubuntu jammy main' | sudo tee /etc/apt/sources.list.d/openresty.list && sudo apt-get update && sudo apt-get install -y openresty mysql-server",
   "customizations": {
     "vscode": {
       "extensions": [
