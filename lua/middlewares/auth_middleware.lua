@@ -1,4 +1,4 @@
--- lua/utils/auth.lua
+-- lua/middlewares/auth_middleware.lua
 local cjson = require("cjson")
 local res = require("utils.response")
 local env = require("utils.env")

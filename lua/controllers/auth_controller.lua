@@ -1,6 +1,12 @@
 -- lua/controllers/auth_controller.lua
-local auth = require("utils.auth")
+local auth = require("middlewares.auth_middleware")
+local cors = require("middlewares.cors")
+local rate_limit = require("middlewares.rate_limit")
 local res = require("utils.response")
+
+-- Aplicação dos Middlewares (CORS e Limite de Requisições)
+if not cors.aplicar() then return end
+if not rate_limit.check() then return end
 
 -- Obtém o método HTTP utilizado na requisição.
 local metodo = ngx.req.get_method()

@@ -2,12 +2,16 @@
 local cjson = require("cjson")
 local usuario_service = require("services.usuario_service")
 local res = require("utils.response")
-local auth = require("utils.auth")
 
--- Valida a autenticação antes de permitir o processamento da requisição.
-if not auth.validar_requisicao() then
-    return
-end
+-- Importação dos Middlewares
+local cors = require("middlewares.cors")
+local rate_limit = require("middlewares.rate_limit")
+local auth = require("middlewares.auth_middleware")
+
+-- Execução dos Middlewares em ordem
+if not cors.aplicar() then return end
+if not rate_limit.check() then return end
+if not auth.validar_requisicao() then return end
 
 -- Obtém o método HTTP, URI e ID informado na rota ou como parâmetro de query.
 local metodo = ngx.req.get_method()

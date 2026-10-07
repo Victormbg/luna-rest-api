@@ -11,8 +11,9 @@ API RESTful de altíssima performance e ultra-baixa latência construída com **
 * 🚀 **Ultra Performance (2 ms):** Roteamento em C/Nginx com regras compiladas (PCRE2) e execução assíncrona transparente via coroutines.
 * 🛡️ **Segurança em Camadas (Zero Trust):** Exige autenticação dupla simultânea por **`x-api-key`** (Base64) e **`Bearer Token`** para máxima proteção dos recursos.
 * 🔑 **Padrão OAuth 2.0 & JWT:** Rota `/token` nativa para emissão de JSON Web Tokens (RFC 7519) assinados em `HMAC-SHA256` com tempo de expiração (`exp`, `iat`, `jti`).
-* 🧩 **Arquitetura Limpa (MVC / Clean Code):** Código desacoplado em camadas bem definidas (`Controllers`, `Services` e `Utils`).
-* 🌐 **Borda & CORS Nativo:** Tratamento de requisições *Preflight* (`OPTIONS`) e cabeçalhos de segurança direto no servidor web.
+* 🧩 **Arquitetura Limpa (MVC / Middlewares):** Separação estrita de responsabilidades em camadas (`Controllers`, `Services`, `Middlewares` e `Utils`).
+* ⏱️ **Rate Limiting Nativo (Proteção Anti-DDoS):** Middleware desacoplado em memória RAM controlando o limite de requisições por IP com resposta automática `HTTP 429 Too Many Requests`.
+* 🌐 **CORS & Preflight Dinâmico:** Gerenciamento centralizado de políticas de origem (`Cross-Origin`) e requisições `OPTIONS` processadas direto pela camada de middleware Lua.
 * 🐳 **Containerização Minimalista:** Imagem Docker otimizada em cima do Alpine Linux com consumo residual de memória RAM.
 
 ---
@@ -44,18 +45,34 @@ API RESTful de altíssima performance e ultra-baixa latência construída com **
 
 ```text
 luna-rest-api/
-├── .vscode/          # Configurações do ambiente de desenvolvimento
+├── .devcontainer/
+│   └── devcontainer.json    # Configurações do ambiente de desenvolvimento automatizado
+├── .vscode/
+│   └── settings.json        # Ajustes de workspace do VS Code
 ├── conf/
-│   └── nginx.conf    # Configuração de borda e rotas do OpenResty
+│   └── nginx.conf           # Mapeamento de rotas e configurações de borda do OpenResty
 ├── db/
-│   └── usuarios.json # Armazenamento de dados local
-├── logs/             # Logs de execução e erros
+│   └── usuarios.json        # Base de dados local para persistência de dados
+├── docker/                  # Scripts e arquivos de construção de imagem Docker
+├── docs/
+│   └── assets/              # Evidências, prints de testes e documentação visual
+├── logs/                    # Arquivos de log do servidor Nginx/OpenResty
 ├── lua/
-│   ├── controllers/  # Manipulação de requisições e respostas HTTP
-│   ├── services/     # Lógica de negócio e gestão de dados
-│   └── utils/        # Helpers reutilizáveis (respostas JSON, etc.)
-├── .gitignore
-└── README.md
+│   ├── controllers/         # Camada de controle e roteamento HTTP
+│   │   ├── auth_controller.lua     # Endpoint de emissão do Token JWT (OAuth 2.0)
+│   │   └── usuario_controller.lua  # Endpoints CRUD de usuários
+│   ├── middlewares/         # Interceptadores de segurança, controle e tráfego
+│   │   ├── auth_middleware.lua     # Validação estrita de credenciais (x-api-key + Bearer JWT)
+│   │   ├── cors.lua                # Tratamento dinâmico de origens e requisições Preflight (OPTIONS)
+│   │   └── rate_limit.lua          # Controle de requisições por IP (Proteção Anti-DDoS)
+│   ├── services/            # Camada de regras de negócio e manipulação dos dados
+│   │   └── usuario_service.lua     # Lógica do CRUD e gerenciamento em memória/JSON
+│   └── utils/               # Helpers e utilitários da aplicação
+│       ├── env.lua          # Utilitário para leitura das variáveis do arquivo .env
+│       └── response.lua     # Padronizador de respostas JSON com ordem fixa de atributos
+├── .env                     # Variáveis de ambiente e chaves secretas do servidor
+├── .gitignore               # Arquivos e pastas ignorados pelo controle de versão
+└── README.md                # Documentação oficial do projeto
 ```
 
 ---
