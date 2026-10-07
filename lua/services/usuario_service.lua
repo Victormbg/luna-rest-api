@@ -1,4 +1,4 @@
-local redis_util = require("lua.utils.redis")
+local redis_util = require("utils.redis")
 local cjson = require("cjson")
 
 local usuario_service = {}
@@ -70,7 +70,7 @@ function usuario_service.criar(novo_usuario)
     return novo_usuario
 end
 
--- Atualiza um usuário existente pelo ID
+-- Atualiza um usuário existente pelo ID de forma dinâmica
 function usuario_service.atualizar(id, dados_novos)
     local red, err = redis_util.get_client()
     if not red then return nil end
@@ -80,8 +80,12 @@ function usuario_service.atualizar(id, dados_novos)
 
     for i, u in ipairs(usuarios) do
         if u.id == id then
-            if dados_novos.nome ~= nil then usuarios[i].nome = dados_novos.nome end
-            if dados_novos.dev ~= nil then usuarios[i].dev = dados_novos.dev end
+            -- Atualiza dinamicamente qualquer chave enviada no payload (exceto o ID)
+            for chave, valor in pairs(dados_novos) do
+                if chave ~= "id" then
+                    usuarios[i][chave] = valor
+                end
+            end
 
             salvar_todos(red, usuarios)
             usuario_atualizado = usuarios[i]
