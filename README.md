@@ -11,8 +11,7 @@ API RESTful de altíssima performance e ultra-baixa latência construída com **
 * 🚀 **Ultra Performance (2 ms):** Roteamento em C/Nginx com regras compiladas (PCRE2) e execução assíncrona transparente via coroutines.
 * 🛡️ **Segurança em Camadas (Zero Trust):** Exige autenticação dupla simultânea por **`x-api-key`** (Base64) e **`Bearer Token`** para máxima proteção dos recursos.
 * 🔑 **Padrão OAuth 2.0 & JWT:** Rota `/token` nativa para emissão de JSON Web Tokens (RFC 7519) assinados em `HMAC-SHA256` com tempo de expiração (`exp`, `iat`, `jti`).
-* 🧩 **Arquitetura Limpa (MVC / Clean Code):** Código desacoplado em camadas bem definidas (`Controllers`, `Services`, `Middlewares` e `Utils`).
-* ⚙️ **Configuração Dinâmica (`.env`):** Leitura de segredos de ambiente sem exposição de dados sensíveis no código base.
+* 🧩 **Arquitetura Limpa (MVC / Clean Code):** Código desacoplado em camadas bem definidas (`Controllers`, `Services` e `Utils`).
 * 🌐 **Borda & CORS Nativo:** Tratamento de requisições *Preflight* (`OPTIONS`) e cabeçalhos de segurança direto no servidor web.
 * 🐳 **Containerização Minimalista:** Imagem Docker otimizada em cima do Alpine Linux com consumo residual de memória RAM.
 
