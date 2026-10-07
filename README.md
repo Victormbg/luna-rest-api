@@ -41,6 +41,32 @@ sudo apt-get update && sudo apt-get install -y openresty mysql-server
 
 ---
 
+## 🐳 Executando com Docker
+
+Se preferir rodar a aplicação em um ambiente isolado na sua máquina utilizando Docker Desktop:
+
+### 1. Gerar a Imagem Docker
+```bash
+docker build -f docker/Dockerfile -t luna-api:latest .
+```
+
+### 2. Iniciar o Container
+```bash
+docker run -d --name luna-app -p 8080:8080 luna-api:latest
+```
+
+### 3. Testar a API Localmente
+```bash
+curl http://localhost:8080/usuarios
+```
+
+### 4. Parar e Remover o Container
+```bash
+docker stop luna-app && docker rm luna-app
+```
+
+---
+
 ## 🛠️ Gerenciando o Servidor
 
 ### Iniciar o servidor
