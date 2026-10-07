@@ -8,8 +8,7 @@ local auth = {}
 local function base64url_encode(data)
     local b64 = ngx.encode_base64(data)
     if not b64 then return "" end
-    b64 = b64:gsub("+", "-"):gsub("/", "_"):gsub("=", "")
-    return b64
+    return b64:gsub("+", "-"):gsub("/", "_"):gsub("=", "")
 end
 
 -- Helper para Decode em Base64URL
@@ -22,7 +21,7 @@ local function base64url_decode(data)
     return ngx.decode_base64(data)
 end
 
--- Criação do Token JWT Profissional (Header.Payload.Signature)
+-- Criação do Token JWT Profissional
 local function criar_jwt(client_id, scope, expires_in)
     local secret = env.get("TOKEN_SECRET_KEY", "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f")
     local now = ngx.time()
@@ -77,7 +76,7 @@ local function validar_jwt(token)
     return payload, nil
 end
 
--- Gerador de Token para a rota POST /token
+-- Gerador de Token
 function auth.gerar_token(client_id, client_secret, scope)
     local env_client_id = env.get("CLIENT_ID", "luna_cli_dev")
     local env_client_secret = env.get("CLIENT_SECRET", "7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e")
@@ -97,43 +96,43 @@ function auth.gerar_token(client_id, client_secret, scope)
     }, nil
 end
 
--- Middleware de Validação das requisições protegidas
+-- Middleware de Validação ESTRITA: Exige OBRIGATORIAMENTE x-api-key E Authorization Bearer Token
 function auth.validar_requisicao()
     local headers = ngx.req.get_headers()
-
-    -- 1. Validação por API Key (x-api-key)
     local api_key = headers["x-api-key"]
-    if api_key and api_key ~= "" then
-        local api_key_env = env.get("API_KEY", "bHVuYV9hcGlfdjFfc2VjcmV0X2FjY2Vzc19rZXlfMjAyNg==")
-        local api_key_decoded = ngx.decode_base64(api_key_env) or ""
-        
-        if api_key == api_key_env or api_key == api_key_decoded then
-            return true
-        end
-        
+    local auth_header = headers["authorization"]
+
+    -- 1. Verifica se AMBOS os cabeçalhos foram enviados
+    if not api_key or api_key == "" or not auth_header or auth_header == "" then
+        res.erro(401, "Acesso negado. É obrigatório enviar AMBOS os cabeçalhos: 'x-api-key' E 'Authorization: Bearer <token>'")
+        return false
+    end
+
+    -- 2. Valida a API Key
+    local api_key_env = env.get("API_KEY", "bHVuYV9hcGlfdjFfc2VjcmV0X2FjY2Vzc19rZXlfMjAyNg==")
+    local api_key_decoded = ngx.decode_base64(api_key_env) or ""
+    
+    if api_key ~= api_key_env and api_key ~= api_key_decoded then
         res.erro(401, "API Key inválida")
         return false
     end
 
-    -- 2. Validação por Bearer Token JWT
-    local auth_header = headers["authorization"]
-    if auth_header and auth_header ~= "" then
-        local token = auth_header:match("^Bearer%s+(.+)$")
-        if token then
-            local payload, err = validar_jwt(token)
-            if payload then
-                ngx.ctx.user = payload
-                return true
-            end
-            res.erro(401, err or "Bearer Token inválido")
-            return false
-        end
+    -- 3. Valida o Bearer Token JWT
+    local token = auth_header:match("^Bearer%s+(.+)$")
+    if not token then
         res.erro(401, "Formato do header Authorization deve ser 'Bearer <token>'")
         return false
     end
 
-    res.erro(401, "Autenticação necessária. Envie 'x-api-key' ou 'Authorization: Bearer <token>'")
-    return false
+    local payload, err = validar_jwt(token)
+    if not payload then
+        res.erro(401, err or "Bearer Token inválido")
+        return false
+    end
+
+    -- Se ambos passaram, adiciona os dados no contexto e autoriza
+    ngx.ctx.user = payload
+    return true
 end
 
 return auth
