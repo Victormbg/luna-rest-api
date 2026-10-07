@@ -107,7 +107,7 @@ docker build -f docker/Dockerfile -t luna-api:latest .
 
 ### 2. Iniciar o Container
 ```bash
-docker run -d --name luna-app -p 8080:8080 luna-api:latest
+docker run -d --name luna-app -p 8080:8080 -p 6379:6379 luna-api:latest
 ```
 
 ### 3. Testar a API Localmente

@@ -1,16 +1,21 @@
 # Usa a imagem oficial minimalista do OpenResty baseada em Alpine Linux
 FROM openresty/openresty:alpine
 
+# Instala o servidor e o cliente Redis via gerenciador de pacotes do Alpine
+RUN apk add --no-cache redis
+
 # Define o diretório de trabalho no container
 WORKDIR /usr/local/openresty/nginx
 
-# Copia as pastas do projeto (voltando um nível para pegar a raiz)
+# Cria a pasta de logs requerida pelo Nginx/OpenResty
+RUN mkdir -p logs
+
+# Copia a estrutura da aplicação
 COPY conf/ ./conf/
 COPY lua/ ./lua/
-COPY db/ ./db/
 
-# Expõe a porta da API
-EXPOSE 8080
+# Expõe as portas da API (8080) e do Redis (6379)
+EXPOSE 8080 6379
 
-# Comando para iniciar o OpenResty
-CMD ["openresty", "-g", "daemon off;"]
+# Inicia o serviço do Redis em background e roda o OpenResty no foreground
+CMD ["sh", "-c", "redis-server --daemonize yes && openresty -g 'daemon off;'"]

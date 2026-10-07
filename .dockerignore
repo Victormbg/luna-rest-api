@@ -1,0 +1,10 @@
+.git
+.gitignore
+.vscode
+.devcontainer
+logs/
+db/
+*.json
+*.md
+Dockerfile
+docker/
