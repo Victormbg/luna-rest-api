@@ -1,89 +1,73 @@
 -- lua/controllers/usuario_controller.lua
 local cjson = require("cjson")
 local usuario_service = require("services.usuario_service")
+local res = require("utils.response")
 
 local metodo = ngx.req.get_method()
--- Captura o ID diretamente da URI (ex: /usuarios/1 -> extrai "1")
 local uri = ngx.var.uri
 local id_param = uri:match("^/usuarios/([0-9]+)$") or ngx.var.arg_id
 
--- GET /usuarios -> Listar todos
+-- GET /usuarios
 if metodo == "GET" then
     local usuarios = usuario_service.listar_todos()
-
-    ngx.status = 200
-    ngx.say(cjson.encode({
+    return res.json(200, {
         sucesso = true,
         total = #usuarios,
         dados = usuarios
-    }))
-    return
+    })
 end
 
--- POST /usuarios -> Criar um novo usuário
+-- POST /usuarios
 if metodo == "POST" then
     ngx.req.read_body()
     local body_raw = ngx.req.get_body_data()
 
     if not body_raw or body_raw == "" then
-        ngx.status = 400
-        ngx.say(cjson.encode({ sucesso = false, erro = "O corpo da requisição não pode estar vazio" }))
-        return
+        return res.erro(400, "O corpo da requisição não pode estar vazio")
     end
 
     local ok, payload = pcall(cjson.decode, body_raw)
     if not ok or not payload.nome then
-        ngx.status = 400
-        ngx.say(cjson.encode({ sucesso = false, erro = "Payload JSON inválido. O campo 'nome' é obrigatório" }))
-        return
+        return res.erro(400, "Payload JSON inválido. O campo 'nome' é obrigatório")
     end
 
     local usuario_criado = usuario_service.criar(payload)
-
-    ngx.status = 201
-    ngx.say(cjson.encode({
-        sucesso = true,
-        mensagem = "Usuário criado com sucesso!",
-        dados = usuario_criado
-    }))
-    return
+    return res.sucesso(201, usuario_criado, "Usuário criado com sucesso!")
 end
 
--- DELETE /usuarios/:id -> Excluir usuário pelo ID
-if metodo == "DELETE" then
-    -- Extrai o ID da URL (ex: /usuarios/1) ou de query param (?id=1)
-    local uri = ngx.var.uri
-    local id_param = uri:match("^/usuarios/([0-9]+)$") or ngx.var.arg_id
-
+-- PUT /usuarios/:id
+if metodo == "PUT" then
     if not id_param then
-        ngx.status = 400
-        ngx.say(cjson.encode({ sucesso = false, erro = "É necessário informar o ID do usuário (ex: /usuarios/1)" }))
-        return
+        return res.erro(400, "É necessário informar o ID do usuário (ex: /usuarios/1)")
     end
 
-    local id_numero = tonumber(id_param)
-    if not id_numero then
-        ngx.status = 400
-        ngx.say(cjson.encode({ sucesso = false, erro = "O ID precisa ser um número válido" }))
-        return
+    ngx.req.read_body()
+    local body_raw = ngx.req.get_body_data()
+    local ok, payload = pcall(cjson.decode, body_raw or "")
+    if not ok then
+        return res.erro(400, "JSON enviado é inválido")
     end
 
-    local sucesso = usuario_service.deletar(id_numero)
-
-    if not sucesso then
-        ngx.status = 404
-        ngx.say(cjson.encode({ sucesso = false, erro = "Usuário não encontrado" }))
-        return
+    local usuario_atualizado = usuario_service.atualizar(tonumber(id_param), payload)
+    if not usuario_atualizado then
+        return res.erro(404, "Usuário não encontrado")
     end
 
-    ngx.status = 200
-    ngx.say(cjson.encode({
-        sucesso = true,
-        mensagem = "Usuário de ID " .. id_numero .. " removido com sucesso!"
-    }))
-    return
+    return res.sucesso(200, usuario_atualizado, "Usuário atualizado com sucesso!")
 end
 
--- Caso o cliente envie PUT ou outros métodos não tratados
-ngx.status = 405
-ngx.say(cjson.encode({ sucesso = false, erro = "Método HTTP não suportado nesta rota" }))
+-- DELETE /usuarios/:id
+if metodo == "DELETE" then
+    if not id_param then
+        return res.erro(400, "É necessário informar o ID do usuário (ex: /usuarios/1)")
+    end
+
+    local sucesso = usuario_service.deletar(tonumber(id_param))
+    if not sucesso then
+        return res.erro(404, "Usuário não encontrado")
+    end
+
+    return res.sucesso(200, nil, "Usuário removido com sucesso!")
+end
+
+return res.erro(405, "Método HTTP não suportado nesta rota")

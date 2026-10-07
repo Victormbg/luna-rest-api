@@ -1,3 +1,10 @@
-logs/
-*_temp/
-*.log
+# Logs e arquivos do OpenResty/Nginx
+logs/*
+!logs/.gitkeep
+
+# Arquivos de banco de dados local
+db/*.json
+usuarios.json
+
+# VS Code / Ambiente
+.vscode/
