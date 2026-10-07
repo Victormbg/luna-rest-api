@@ -2,6 +2,12 @@
 local cjson = require("cjson")
 local usuario_service = require("services.usuario_service")
 local res = require("utils.response")
+local auth = require("utils.auth")
+
+-- Validação de Autenticação (x-api-key ou Bearer Token)
+if not auth.validar_requisicao() then
+    return
+end
 
 local metodo = ngx.req.get_method()
 local uri = ngx.var.uri
@@ -11,7 +17,7 @@ local id_param = uri:match("^/usuarios/([0-9]+)$") or ngx.var.arg_id
 if metodo == "GET" then
     local usuarios = usuario_service.listar_todos()
     return res.json(200, {
-        sucesso = true,
+        status = "sucesso",
         total = #usuarios,
         dados = usuarios
     })
@@ -32,7 +38,7 @@ if metodo == "POST" then
     end
 
     local usuario_criado = usuario_service.criar(payload)
-    return res.sucesso(201, usuario_criado, "Usuário criado com sucesso!")
+    return res.sucesso(201, "Usuário criado com sucesso!", usuario_criado)
 end
 
 -- PUT /usuarios/:id
@@ -53,7 +59,7 @@ if metodo == "PUT" then
         return res.erro(404, "Usuário não encontrado")
     end
 
-    return res.sucesso(200, usuario_atualizado, "Usuário atualizado com sucesso!")
+    return res.sucesso(200, "Usuário atualizado com sucesso!", usuario_atualizado)
 end
 
 -- DELETE /usuarios/:id
@@ -67,7 +73,7 @@ if metodo == "DELETE" then
         return res.erro(404, "Usuário não encontrado")
     end
 
-    return res.sucesso(200, nil, "Usuário removido com sucesso!")
+    return res.sucesso(200, "Usuário removido com sucesso!")
 end
 
 return res.erro(405, "Método HTTP não suportado nesta rota")
