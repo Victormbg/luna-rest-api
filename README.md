@@ -8,15 +8,15 @@ API RESTful de altíssima performance e ultra-baixa latência construída com **
 
 ## 🎯 Destaques do Projeto
 
-* 🚀 **Ultra Performance (2 ms):** Roteamento em C/Nginx com regras compiladas (PCRE2) e execução assíncrona transparente via coroutines.
+* 🚀 **Ultra Performance (2 ms):** Roteamento em C/Nginx com regras compiladas (PCRE2) e execução assíncrona transparente via coroutines no LuaJIT.
 * ⚡ **Persistência em Memória (Redis):** Integrado via `resty.redis` (módulo não-bloqueante nativo do OpenResty) utilizando *connection pooling* e operações atômicas (`INCR`).
 * 🛡️ **Segurança em Camadas (Zero Trust):** Exige autenticação dupla simultânea por **`x-api-key`** (Base64) e **`Bearer Token`** para máxima proteção dos recursos.
 * 🔑 **Padrão OAuth 2.0 & JWT:** Rota `/token` nativa para emissão de JSON Web Tokens (RFC 7519) assinados em `HMAC-SHA256` com tempo de expiração (`exp`, `iat`, `jti`).
-* 🧩 **Arquitetura Limpa (MVC / Middlewares):** Separação estrita de responsabilidades em camadas (`Controllers`, `Services`, `Middlewares` e `Utils`).
-* ⏱️ **Rate Limiting Nativo (Proteção Anti-DDoS):** Middleware desacoplado em memória RAM controlando o limite de requisições por IP com resposta automática `HTTP 429 Too Many Requests`.
-* 🌐 **CORS & Preflight Dinâmico:** Gerenciamento centralizado de políticas de origem (`Cross-Origin`) e requisições `OPTIONS` processadas direto pela camada de middleware Lua.
-* 🐳 **Containerização Minimalista:** Ambiente de desenvolvimento devcontainer no GitHub Codespaces pré-configurado com OpenResty, Redis e Lua.
-
+* 📋 **Validação por Schemas:** Middleware desacoplado que valida tipos de dados, obrigatoriedade e regras customizadas em payloads JSON antes de processar a requisição.
+* 🧩 **Arquitetura Limpa em Camadas:** Separação estrita de responsabilidades (`Config`, `Controllers`, `Middlewares`, `Routes`, `Schemas`, `Services` e `Utils`).
+* ⏱️ **Rate Limiting Nativo (Proteção Anti-DDoS):** Middleware em memória RAM controlando o limite de requisições por IP com resposta automática `HTTP 429 Too Many Requests`.
+* 🌐 **CORS & Preflight Dinâmico:** Gerenciamento centralizado de políticas de origem (`Cross-Origin`) e requisições `OPTIONS` processadas direto na camada de middleware.
+* 🐳 **Containerização Minimalista:** Ambiente de desenvolvimento automatizado via `.devcontainer` e imagem Docker Alpine otimizada.
 ---
 
 ## 📸 Evidências de Testes & Performance
@@ -51,28 +51,36 @@ luna-rest-api/
 ├── .vscode/
 │   └── settings.json        # Ajustes de workspace do VS Code
 ├── conf/
-│   └── nginx.conf           # Mapeamento de rotas e configurações de borda do OpenResty
-├── db/
-│   └── usuarios.json        # Base de dados local para persistência de dados
-├── docker/                  # Scripts e arquivos de construção de imagem Docker
+│   └── nginx.conf           # Configuração de borda e servidor OpenResty
+├── docker/                  # Scripts e arquivos de construção da imagem Docker
 ├── docs/
 │   └── assets/              # Evidências, prints de testes e documentação visual
 ├── logs/                    # Arquivos de log do servidor Nginx/OpenResty
 ├── lua/
-│   ├── controllers/         # Camada de controle e roteamento HTTP
-│   │   ├── auth_controller.lua     # Endpoint de emissão do Token JWT (OAuth 2.0)
-│   │   └── usuario_controller.lua  # Endpoints CRUD de usuários
-│   ├── middlewares/         # Interceptadores de segurança, controle e tráfego
-│   │   ├── auth_middleware.lua     # Validação estrita de credenciais (x-api-key + Bearer JWT)
-│   │   ├── cors.lua                # Tratamento dinâmico de origens e requisições Preflight (OPTIONS)
-│   │   └── rate_limit.lua          # Controle de requisições por IP (Proteção Anti-DDoS)
-│   ├── services/            # Camada de regras de negócio e manipulação dos dados
-│   │   └── usuario_service.lua     # Lógica do CRUD e gerenciamento em memória/JSON
+│   ├── config/              # Parâmetros globais de ambiente e conexão
+│   │   ├── env.lua          # Leitura centralizada de variáveis do arquivo .env
+│   │   └── redis.lua        # Configurações de timeout e pool do Redis
+│   ├── controllers/         # Manipuladores de requisição e orquestração de resposta
+│   │   ├── auth_controller.lua     # Endpoint do fluxo OAuth 2.0 /token
+│   │   └── usuario_controller.lua  # Endpoints do CRUD de usuários
+│   ├── middlewares/         # Interceptadores de segurança e validação
+│   │   ├── auth_middleware.lua     # Validação estrita de x-api-key e Bearer JWT
+│   │   ├── cors.lua                # Gerenciamento de cabeçalhos e preflight OPTIONS
+│   │   ├── rate_limit.lua          # Controle de tráfego e limite por IP
+│   │   └── validator_middleware.lua # Validador dinâmico baseado em Schemas
+│   ├── routes/              # Roteamento centralizado da API
+│   │   └── api.lua          # Mapeamento de URIs para os controllers
+│   ├── schemas/             # Schemas e regras estruturais do payload JSON
+│   │   └── usuario_schema.lua      # Contrato dos campos de dados do usuário
+│   ├── services/            # Camada de regras de negócio e acesso aos dados
+│   │   ├── auth_service.lua        # Geração, assinação e validação do JWT
+│   │   └── usuario_service.lua     # Operações atômicas e persistência no Redis
 │   └── utils/               # Helpers e utilitários da aplicação
-│       ├── env.lua          # Utilitário para leitura das variáveis do arquivo .env
-│       └── response.lua     # Padronizador de respostas JSON com ordem fixa de atributos
-├── .env                     # Variáveis de ambiente e chaves secretas do servidor
-├── .gitignore               # Arquivos e pastas ignorados pelo controle de versão
+│       ├── redis.lua        # Cliente e gerenciador do ciclo de vida do resty.redis
+│       └── response.lua     # Padronizador de respostas JSON
+├── .dockerignore            # Arquivos ignorados no contexto de build do Docker
+├── .env                     # Variáveis de ambiente e chaves secretas
+├── .gitignore               # Arquivos e pastas ignorados pelo Git
 └── README.md                # Documentação oficial do projeto
 ```
 
