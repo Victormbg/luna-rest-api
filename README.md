@@ -17,3 +17,7 @@ openresty -p . -c conf/nginx.conf
 ### 3. Parar openresty
 ```bash
 openresty -p . -c conf/nginx.conf -s stop
+
+### 3. Reiniciar openresty
+```bash
+openresty -p . -c conf/nginx.conf -s reload
