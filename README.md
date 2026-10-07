@@ -94,37 +94,53 @@ sudo killall nginx openresty
 
 ## 🧪 Endpoints da API
 
-| Método | Rota | Descrição |
-| :--- | :--- | :--- |
-| **GET** | `/usuarios` | Lista todos os usuários cadastrados |
-| **POST** | `/usuarios` | Cadastra um novo usuário |
-| **PUT** | `/usuarios/:id` | Atualiza os dados de um usuário pelo ID |
-| **DELETE** | `/usuarios/:id` | Remove um usuário pelo ID |
+| Método | Rota | Autenticação | Descrição |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/token` | Pública | Gera o Bearer Token JWT (Padrão OAuth 2.0) |
+| **GET** | `/usuarios` | `x-api-key` + `Bearer Token` | Lista todos os usuários cadastrados |
+| **POST** | `/usuarios` | `x-api-key` + `Bearer Token` | Cadastra um novo usuário |
+| **PUT** | `/usuarios/:id` | `x-api-key` + `Bearer Token` | Atualiza os dados de um usuário pelo ID |
+| **DELETE** | `/usuarios/:id` | `x-api-key` + `Bearer Token` | Remove um usuário pelo ID |
 
 ---
 
 ## 💻 Exemplos de Requisições (`curl`)
 
-**1. Listar Usuários:**
+**1. Gerar Bearer Token (OAuth 2.0):**
 ```bash
-curl http://localhost:8080/usuarios
+curl -X POST http://localhost:8080/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "client_id=luna_cli_dev&client_secret=7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e&grant_type=client_credentials&scope=read write"
 ```
 
-**2. Criar Usuário:**
+**2. Listar Usuários:**
+```bash
+curl http://localhost:8080/usuarios \
+  -H "x-api-key: bHVuYV9hcGlfdjFfc2VjcmV0X2FjY2Vzc19rZXlfMjAyNg==" \
+  -H "Authorization: Bearer <SEU_TOKEN_JWT>"
+```
+
+**3. Criar Usuário:**
 ```bash
 curl -X POST http://localhost:8080/usuarios \
+  -H "x-api-key: bHVuYV9hcGlfdjFfc2VjcmV0X2FjY2Vzc19rZXlfMjAyNg==" \
+  -H "Authorization: Bearer <SEU_TOKEN_JWT>" \
   -H "Content-Type: application/json" \
   -d '{"nome": "Victor", "dev": true}'
 ```
 
-**3. Atualizar Usuário:**
+**4. Atualizar Usuário:**
 ```bash
 curl -X PUT http://localhost:8080/usuarios/1 \
+  -H "x-api-key: bHVuYV9hcGlfdjFfc2VjcmV0X2FjY2Vzc19rZXlfMjAyNg==" \
+  -H "Authorization: Bearer <SEU_TOKEN_JWT>" \
   -H "Content-Type: application/json" \
   -d '{"nome": "Victor M."}'
 ```
 
-**4. Apagar Usuário:**
+**5. Apagar Usuário:**
 ```bash
-curl -X DELETE http://localhost:8080/usuarios/1
+curl -X DELETE http://localhost:8080/usuarios/1 \
+  -H "x-api-key: bHVuYV9hcGlfdjFfc2VjcmV0X2FjY2Vzc19rZXlfMjAyNg==" \
+  -H "Authorization: Bearer <SEU_TOKEN_JWT>"
 ```
