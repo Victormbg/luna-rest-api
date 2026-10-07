@@ -17,6 +17,14 @@ API RESTful de altíssima performance e ultra-baixa latência construída com **
 
 ---
 
+## 📸 Evidências de Testes & Performance
+![alt text](docs/assets/image.png)
+![alt text](docs/assets/image-1.png)
+![alt text](docs/assets/image-2.png)
+![alt text](docs/assets/image-3.png)
+
+---
+
 ## 📁 Estrutura do Projeto
 
 ```text
