@@ -21,23 +21,19 @@ API RESTful de altíssima performance e ultra-baixa latência construída com **
 
 <table>
   <tr>
-    <td align="center" width="50%">
-      <b>⚡ Benchmark GET /usuarios (2 ms)</b><br/><br/>
-      <img src="docs/assets/image.png" alt="Benchmark 2ms" width="100%"/>
+    <td width="50%">
+      <img src="docs/assets/image.png" alt="Evidência 1" width="100%"/>
     </td>
-    <td align="center" width="50%">
-      <b>🔑 Emissão de JWT (POST /token)</b><br/><br/>
-      <img src="docs/assets/image-1.png" alt="Geração de Token JWT" width="100%"/>
+    <td width="50%">
+      <img src="docs/assets/image-1.png" alt="Evidência 2" width="100%"/>
     </td>
   </tr>
   <tr>
-    <td align="center" width="50%">
-      <b>🛡️ Bloqueio Sem Headers (401)</b><br/><br/>
-      <img src="docs/assets/image-2.png" alt="Bloqueio sem Autenticação" width="100%"/>
+    <td width="50%">
+      <img src="docs/assets/image-2.png" alt="Evidência 3" width="100%"/>
     </td>
-    <td align="center" width="50%">
-      <b>✅ Dupla Autenticação Aprovada</b><br/><br/>
-      <img src="docs/assets/image-3.png" alt="Autenticação Completa com Sucesso" width="100%"/>
+    <td width="50%">
+      <img src="docs/assets/image-3.png" alt="Evidência 4" width="100%"/>
     </td>
   </tr>
 </table>
