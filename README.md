@@ -1,6 +1,20 @@
 # 🌙 Luna REST API (OpenResty + Lua)
 
-API RESTful de altíssima performance construída com **Lua** e **OpenResty**, seguindo uma arquitetura limpa e desacoplada em camadas (Controller, Service e Utils).
+API RESTful de altíssima performance e ultra-baixa latência construída com **Lua** e **OpenResty** (Nginx + LuaJIT), projetada para lidar com um volume massivo de requisições por segundo utilizando processamento não-bloqueante baseado em coroutines.
+
+> ⚡ **Benchmark Local:** Em testes executados via **Docker Desktop (Alpine)**, a API atingiu um tempo de resposta de apenas **2 ms** no endpoint de busca de usuários, demonstrando a eficiência extrema do ecossistema LuaJIT em memória.
+
+---
+
+## 🎯 Destaques do Projeto
+
+* 🚀 **Ultra Performance (2 ms):** Roteamento em C/Nginx com regras compiladas (PCRE2) e execução assíncrona transparente via coroutines.
+* 🛡️ **Segurança em Camadas (Zero Trust):** Exige autenticação dupla simultânea por **`x-api-key`** (Base64) e **`Bearer Token`** para máxima proteção dos recursos.
+* 🔑 **Padrão OAuth 2.0 & JWT:** Rota `/token` nativa para emissão de JSON Web Tokens (RFC 7519) assinados em `HMAC-SHA256` com tempo de expiração (`exp`, `iat`, `jti`).
+* 🧩 **Arquitetura Limpa (MVC / Clean Code):** Código desacoplado em camadas bem definidas (`Controllers`, `Services`, `Middlewares` e `Utils`).
+* ⚙️ **Configuração Dinâmica (`.env`):** Leitura de segredos de ambiente sem exposição de dados sensíveis no código base.
+* 🌐 **Borda & CORS Nativo:** Tratamento de requisições *Preflight* (`OPTIONS`) e cabeçalhos de segurança direto no servidor web.
+* 🐳 **Containerização Minimalista:** Imagem Docker otimizada em cima do Alpine Linux com consumo residual de memória RAM.
 
 ---
 
