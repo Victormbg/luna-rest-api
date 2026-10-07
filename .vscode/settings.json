@@ -1,0 +1,8 @@
+{
+  "Lua.diagnostics.globals": [
+    "ngx",
+    "ndk"
+  ],
+  "Lua.runtime.version": "LuaJIT",
+  "Lua.workspace.checkThirdParty": false
+}
