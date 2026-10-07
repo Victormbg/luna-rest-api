@@ -2,13 +2,13 @@
 
 API RESTful de altíssima performance e ultra-baixa latência construída com **Lua** e **OpenResty** (Nginx + LuaJIT), projetada para lidar com um volume massivo de requisições por segundo utilizando processamento não-bloqueante baseado em coroutines e **armazenamento de baixa latência no Redis**.
 
-> ⚡ **Benchmark Local:** Em testes executados via **Docker Desktop (Alpine)**, a API atingiu um tempo de resposta de apenas **2 ms** no endpoint de busca de usuários, demonstrando a eficiência extrema da combinação LuaJIT + Redis em memória.
+> ⚡ **Benchmark Local:** Em testes executados via **Docker Desktop (Alpine)**, a API atingiu um tempo de resposta de apenas **3 ms** no endpoint de busca de usuários e **11 ms** para escrita e validação de schema com Redis, demonstrando a eficiência extrema da combinação LuaJIT + Redis em memória.
 
 ---
 
 ## 🎯 Destaques do Projeto
 
-* 🚀 **Ultra Performance (2 ms):** Roteamento em C/Nginx com regras compiladas (PCRE2) e execução assíncrona transparente via coroutines no LuaJIT.
+* 🚀 **Ultra Performance (3 ms):** Roteamento em C/Nginx com regras compiladas (PCRE2) e execução assíncrona transparente via coroutines no LuaJIT.
 * ⚡ **Persistência em Memória (Redis):** Integrado via `resty.redis` (módulo não-bloqueante nativo do OpenResty) utilizando *connection pooling* e operações atômicas (`INCR`).
 * 🛡️ **Segurança em Camadas (Zero Trust):** Exige autenticação dupla simultânea por **`x-api-key`** (Base64) e **`Bearer Token`** para máxima proteção dos recursos.
 * 🔑 **Padrão OAuth 2.0 & JWT:** Rota `/token` nativa para emissão de JSON Web Tokens (RFC 7519) assinados em `HMAC-SHA256` com tempo de expiração (`exp`, `iat`, `jti`).
