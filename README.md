@@ -1,20 +1,21 @@
 # 🌙 Luna REST API (OpenResty + Lua)
 
-API RESTful de altíssima performance e ultra-baixa latência construída com **Lua** e **OpenResty** (Nginx + LuaJIT), projetada para lidar com um volume massivo de requisições por segundo utilizando processamento não-bloqueante baseado em coroutines.
+API RESTful de altíssima performance e ultra-baixa latência construída com **Lua** e **OpenResty** (Nginx + LuaJIT), projetada para lidar com um volume massivo de requisições por segundo utilizando processamento não-bloqueante baseado em coroutines e **armazenamento de baixa latência no Redis**.
 
-> ⚡ **Benchmark Local:** Em testes executados via **Docker Desktop (Alpine)**, a API atingiu um tempo de resposta de apenas **2 ms** no endpoint de busca de usuários, demonstrando a eficiência extrema do ecossistema LuaJIT em memória.
+> ⚡ **Benchmark Local:** Em testes executados via **Docker Desktop (Alpine)**, a API atingiu um tempo de resposta de apenas **2 ms** no endpoint de busca de usuários, demonstrando a eficiência extrema da combinação LuaJIT + Redis em memória.
 
 ---
 
 ## 🎯 Destaques do Projeto
 
 * 🚀 **Ultra Performance (2 ms):** Roteamento em C/Nginx com regras compiladas (PCRE2) e execução assíncrona transparente via coroutines.
+* ⚡ **Persistência em Memória (Redis):** Integrado via `resty.redis` (módulo não-bloqueante nativo do OpenResty) utilizando *connection pooling* e operações atômicas (`INCR`).
 * 🛡️ **Segurança em Camadas (Zero Trust):** Exige autenticação dupla simultânea por **`x-api-key`** (Base64) e **`Bearer Token`** para máxima proteção dos recursos.
 * 🔑 **Padrão OAuth 2.0 & JWT:** Rota `/token` nativa para emissão de JSON Web Tokens (RFC 7519) assinados em `HMAC-SHA256` com tempo de expiração (`exp`, `iat`, `jti`).
 * 🧩 **Arquitetura Limpa (MVC / Middlewares):** Separação estrita de responsabilidades em camadas (`Controllers`, `Services`, `Middlewares` e `Utils`).
 * ⏱️ **Rate Limiting Nativo (Proteção Anti-DDoS):** Middleware desacoplado em memória RAM controlando o limite de requisições por IP com resposta automática `HTTP 429 Too Many Requests`.
 * 🌐 **CORS & Preflight Dinâmico:** Gerenciamento centralizado de políticas de origem (`Cross-Origin`) e requisições `OPTIONS` processadas direto pela camada de middleware Lua.
-* 🐳 **Containerização Minimalista:** Imagem Docker otimizada em cima do Alpine Linux com consumo residual de memória RAM.
+* 🐳 **Containerização Minimalista:** Ambiente de desenvolvimento devcontainer no GitHub Codespaces pré-configurado com OpenResty, Redis e Lua.
 
 ---
 
@@ -77,19 +78,20 @@ luna-rest-api/
 
 ---
 
-## 🚀 Como Executar no GitHub Codespaces
-
-Se estiver configurando o ambiente manualmente sem a automação do `.devcontainer`:
-
-### 1. Instalar Dependências (Apenas na 1ª vez)
+### 🗄️ Comandos do Redis
 
 ```bash
-# Adiciona o repositório oficial do OpenResty
-wget -qO - [https://openresty.org/package/pubkey.gpg](https://openresty.org/package/pubkey.gpg) | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/openresty.gpg
-echo "deb [http://openresty.org/package/ubuntu](http://openresty.org/package/ubuntu) jammy main" | sudo tee /etc/apt/sources.list.d/openresty.list
+# Listar todas as chaves cadastradas no banco
+redis-cli KEYS "*"
 
-# Atualiza e instala os pacotes
-sudo apt-get update && sudo apt-get install -y openresty mysql-server
+# Visualizar a lista de usuários armazenada
+redis-cli GET "usuarios:lista"
+
+# Consultar o valor do contador atual de IDs
+redis-cli GET "usuarios:id_counter"
+
+# Limpar todas as chaves do banco (resetar dados)
+redis-cli FLUSHALL
 ```
 
 ---

@@ -1,13 +1,43 @@
 {
-  "name": "OpenResty Lua API",
+  "name": "Luna REST API Development",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y wget gnupg lsb-release && wget -qO - https://openresty.org/package/pubkey.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/openresty.gpg && echo 'deb http://openresty.org/package/ubuntu jammy main' | sudo tee /etc/apt/sources.list.d/openresty.list && sudo apt-get update && sudo apt-get install -y openresty mysql-server",
+
+  // Baixa a chave GPG do OpenResty, registra o repositório e instala os pacotes do sistema
+  "updateContentCommand": "sudo apt-get update && sudo apt-get install -y wget gnupg ca-certificates lsb-release build-essential redis-server luarocks lua5.3 liblua5.3-dev lua-cjson && sudo mkdir -p /etc/apt/keyrings && wget -qO- https://openresty.org/package/pubkey.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/openresty.gpg && echo 'deb [signed-by=/etc/apt/keyrings/openresty.gpg] http://openresty.org/package/ubuntu noble main' | sudo tee /etc/apt/sources.list.d/openresty.list && sudo apt-get update && sudo apt-get install -y openresty",
+
+  // Instala a biblioteca do Redis para Lua
+  "postCreateCommand": "sudo luarocks install redis-lua LUA_INCDIR=/usr/include/lua5.3",
+
+  // Inicia o Redis e o OpenResty em segundo plano
+  "postStartCommand": "sudo service redis-server start && sudo openresty -p . -c conf/nginx.conf",
+
   "customizations": {
     "vscode": {
       "extensions": [
-        "sumneko.lua"
-      ]
+        "sumneko.lua",
+        "leandro-rodrigues.openresty-lua"
+      ],
+      "settings": {
+        "Lua.runtime.version": "LuaJIT",
+        "Lua.diagnostics.globals": [
+          "ngx",
+          "ndk"
+        ]
+      }
     }
   },
-  "forwardPorts": [8080]
+
+  "forwardPorts": [6379, 8080],
+
+  "portsAttributes": {
+    "8080": {
+      "label": "OpenResty API",
+      "visibility": "public",
+      "onAutoForward": "notify"
+    },
+    "6379": {
+      "label": "Redis Database",
+      "visibility": "private"
+    }
+  }
 }

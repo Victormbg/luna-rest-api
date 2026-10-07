@@ -1,10 +1,10 @@
-# Logs e arquivos do OpenResty/Nginx
+# Ignora os arquivos de log gerados, mas mantém a pasta rastreada
 logs/*
 !logs/.gitkeep
 
-# Arquivos de banco de dados local
+# Banco de dados local
 db/*.json
 usuarios.json
 
-# VS Code / Ambiente
+# Configurações de ambiente
 .vscode/
